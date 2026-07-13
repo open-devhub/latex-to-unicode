@@ -24,7 +24,7 @@ npm install @devhub-io/latex-to-unicode
 ## Usage
 
 ```ts
-import { latexToUnicode } from "@devhub-io/latex-to-unicode";
+import { latexToUnicode, isLatex } from "@devhub-io/latex-to-unicode";
 
 const input = String.raw`$$ R_{\mu\nu} - \tfrac{1}{2} R\,g_{\mu\nu} + \Lambda\,g_{\mu\nu} = \frac{8\pi G}{c^{4}}\,T_{\mu\nu} $$`;
 
@@ -37,6 +37,26 @@ console.log(latexToUnicode(input));
 ### `latexToUnicode(input: string): string`
 
 Converts a string containing LaTeX macros, subscripts, superscripts, fractions, and roots into a Unicode-rendered equivalent. Unrecognized commands are left as-is rather than stripped, so partial input degrades predictably instead of losing information silently.
+
+### `isLatex(input: string): boolean`
+
+Heuristically detects whether a string contains LaTeX/math notation, so you can decide whether it's worth running through `latexToUnicode` at all. This is not a parser — it scores several independent signals and returns `true` once enough of them accumulate:
+
+| Signal                                                              | Points |
+| ------------------------------------------------------------------- | ------ |
+| Math-mode delimiters (`$...$`, `$$...$$`, `\(...\)`, `\[...\]`)     | +3     |
+| Known LaTeX command (Greek letters, `\frac`, `\sqrt`, `\sum`, etc.) | +2     |
+| Braced subscript/superscript (`x_{...}`, `x^{...}`)                 | +2     |
+| Any backslash command taking a brace argument                       | +1     |
+| Bare superscript (`x^2`)                                            | +1     |
+
+A string needs a total score of `2` or higher to return `true`. This keeps ordinary text — snake_case identifiers, filenames, casual `x^2`-style prose — from being flagged as math, while still catching real LaTeX with a single strong signal like `$$...$$` or `\frac{}{}`.
+
+```ts
+isLatex("R_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}"); // true
+isLatex("check out my_variable_name in the code"); // false
+isLatex("the area is x^2 + y^2"); // false — a single bare superscript isn't enough on its own
+```
 
 ## What it converts
 

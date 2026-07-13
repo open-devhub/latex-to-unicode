@@ -3,6 +3,7 @@ import { GREEK } from "./unicode/greek.js";
 import { SUB } from "./unicode/sub.js";
 import { SUPER } from "./unicode/super.js";
 import { SYMBOLS } from "./unicode/symbols.js";
+import { isLatex } from "./utils/isLatex.js";
 
 const WRAPPER_COMMANDS = [
   "text",
@@ -152,7 +153,9 @@ function cleanup(input: string): string {
     .trim();
 }
 
-export default function latexToUnicode(input: string): string {
+export function latexToUnicode(input: string): string {
+  if (!isLatex(input)) return input;
+
   let s = input;
   s = s.replace(/\\_/g, "_");
   s = replaceMacros(s);
@@ -162,3 +165,5 @@ export default function latexToUnicode(input: string): string {
   s = cleanup(s);
   return s;
 }
+
+export { isLatex } from "./utils/isLatex.js";
