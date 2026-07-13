@@ -2,13 +2,15 @@
 
 ## `v2.0.0` - 2026-07-13
 
-### Changed
-
-- Migrated the primary export of `latexToUnicode` from a default export to a **named export**
-
 ### Added
 
 - Added and exported a new utility function `isLatex` to heuristically detect whether a string contains LaTeX/math notation
+- Added a second `opts` argument to `latexToUnicode` to control its behavior.
+  - `opts.checkLatex` (default: `true`) - When `true`, runs `isLatex(input)` first and immediately returns the input unmodified if no LaTeX patterns are detected. Set to `false` to force processing on all strings.
+
+### Changed
+
+- Migrated the primary export of `latexToUnicode` from a default export to a **named export**
 
 ## `v1.0.0` - 2026-07-13
 

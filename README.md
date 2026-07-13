@@ -38,6 +38,24 @@ console.log(latexToUnicode(input));
 
 Converts a string containing LaTeX macros, subscripts, superscripts, fractions, and roots into a Unicode-rendered equivalent. Unrecognized commands are left as-is rather than stripped, so partial input degrades predictably instead of losing information silently.
 
+#### Options
+
+You can customize the execution behavior by passing an optional `Options` object as the second argument:
+
+| Property     | Type      | Default | Description                                                                                                                                                                 |
+| :----------- | :-------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `latexCheck` | `boolean` | `true`  | When `true`, runs `isLatex(input)` first and immediately returns the input unmodified if no LaTeX patterns are detected. Set to `false` to force processing on all strings. |
+
+```typescript
+// Standard usage (automatically skips non-LaTeX strings using `isLatex` helper)
+const result = latexToUnicode("\\alpha + \\beta");
+console.log(result); // α + β
+
+// Force processing even if the string doesn't look like LaTeX
+const forcedResult = latexToUnicode("x^2", { latexCheck: false });
+console.log(forcedResult); // x²
+```
+
 ### `isLatex(input: string): boolean`
 
 Heuristically detects whether a string contains LaTeX/math notation, so you can decide whether it's worth running through `latexToUnicode` at all. This is not a parser — it scores several independent signals and returns `true` once enough of them accumulate:

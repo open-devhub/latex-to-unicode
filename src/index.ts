@@ -1,4 +1,5 @@
 import type { CharMap } from "./types/CharMap.js";
+import type { Options } from "./types/Options.js";
 import { GREEK } from "./unicode/greek.js";
 import { SUB } from "./unicode/sub.js";
 import { SUPER } from "./unicode/super.js";
@@ -153,8 +154,14 @@ function cleanup(input: string): string {
     .trim();
 }
 
-export function latexToUnicode(input: string): string {
-  if (!isLatex(input)) return input;
+const defaultOptions: Options = {
+  latexCheck: true,
+};
+
+export function latexToUnicode(input: string, opts?: Options): string {
+  opts = { ...defaultOptions, ...opts };
+
+  if (opts?.latexCheck && !isLatex(input)) return input;
 
   let s = input;
   s = s.replace(/\\_/g, "_");
