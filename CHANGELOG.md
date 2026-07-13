@@ -8,6 +8,7 @@
 - Added a second `opts` argument to `latexToUnicode` to control its behavior.
   - `opts.checkLatex` (default: `true`) - When `true`, runs `isLatex(input)` first and immediately returns the input unmodified if no LaTeX patterns are detected. Set to `false` to force processing on all strings.
   - `opts.customMacros` (default: `{}`) - A dictionary mapping custom LaTeX macro names (without backslashes) to their desired Unicode equivalents. Overrides default maps.
+  - `opts.fallbackBehavior` (default: `"parentheses"`) - Determines how characters with no native Unicode script counterpart (like Greek letters) are handled. `"parentheses"` wraps them in script-level parens (e.g., `₍μ₎`), `"raw"` preserves the original LaTeX syntax (e.g., `_{\mu}`), and `"strip"` flattens them to plain characters (e.g., `μ`).
 
 ### Changed
 

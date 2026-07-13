@@ -13,4 +13,12 @@ export interface Options {
    * ```
    */
   customMacros?: Record<string, string>;
+  /**
+   * Controls what happens when a subscript or superscript character has no true Unicode equivalent.
+   * - `"parentheses"`: Wraps the character inside true subscript/superscript parens, e.g., ₍μ₎.
+   * - `"raw"`: Leaves the LaTeX script formatting block intact, e.g., _{\mu}.
+   * - `"strip"`: Removes the formatting syntax, flattening the character to plain text, e.g., μ.
+   * @default "parentheses"
+   */
+  fallbackBehaviour?: "parentheses" | "raw" | "strip";
 }

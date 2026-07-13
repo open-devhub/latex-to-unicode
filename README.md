@@ -42,10 +42,11 @@ Converts a string containing LaTeX macros, subscripts, superscripts, fractions, 
 
 You can customize the execution behavior by passing an optional `Options` object as the second argument:
 
-| Property       | Type                     | Default | Description                                                                                                                                                                 |
-| :------------- | :----------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `latexCheck`   | `boolean`                | `true`  | When `true`, runs `isLatex(input)` first and immediately returns the input unmodified if no LaTeX patterns are detected. Set to `false` to force processing on all strings. |
-| `customMacros` | `Record<string, string>` | `{}`    | A dictionary mapping custom LaTeX macro names (without backslashes) to their desired Unicode equivalents. Overrides default maps.                                           |
+| Property            | Type                                    | Default         | Description                                                                                                                                                                                                                                                                                       |
+| :------------------ | :-------------------------------------- | :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `latexCheck`        | `boolean`                               | `true`          | When `true`, runs `isLatex(input)` first and immediately returns the input unmodified if no LaTeX patterns are detected. Set to `false` to force processing on all strings.                                                                                                                       |
+| `customMacros`      | `Record<string, string>`                | `{}`            | A dictionary mapping custom LaTeX macro names (without backslashes) to their desired Unicode equivalents. Overrides default maps.                                                                                                                                                                 |
+| `fallbackBehaviour` | `"parentheses"` \| `"raw"` \| `"strip"` | `"parentheses"` | Determines how characters with no native Unicode script counterpart (like Greek letters) are handled. `"parentheses"` wraps them in script-level parens (e.g., `₍μ₎`), `"raw"` preserves the original LaTeX syntax (e.g., `_{\mu}`), and `"strip"` flattens them to plain characters (e.g., `μ`). |
 
 ```typescript
 // Standard usage
@@ -78,6 +79,37 @@ A string needs a total score of `2` or higher to return `true`. This keeps ordin
 isLatex("R_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}"); // true
 isLatex("check out my_variable_name in the code"); // false
 isLatex("the area is x^2 + y^2"); // false — a single bare superscript isn't enough on its own
+```
+
+### `extractMacros(input: string): string[]`
+
+Parses the input string and extracts all unique LaTeX macro names (commands starting with a backslash). It collects the names, strips the leading backslash, and deduplicates the results.
+
+- **Returns:** An array of string macro names (e.g., `["alpha", "beta"]`).
+- **Behavior:** Only captures alphabetical commands; it ignores special single-character escape symbols like `\,` or `\_`.
+
+```typescript
+import { extractMacros } from "latex-to-unicode";
+
+extractMacros("\\alpha + \\beta = \\theta + \\alpha");
+// Returns: ["alpha", "beta", "theta"]
+```
+
+### `hasMacro(input: string, macroName: string): boolean`
+
+Checks whether a specific LaTeX macro is present in the input string.
+
+- **Smart Matching:** You can pass the macro name with or without the leading backslash (e.g., `"beta"` or `"\\beta"` both work).
+- **Word Boundaries:** It uses strict word-boundary matching so that checking for `"pi"` will not falsely match `"varkappa"` or `"pitchfork"`.
+
+```typescript
+import { hasMacro } from "latex-to-unicode";
+
+const formula = "\\alpha + \\beta";
+
+hasMacro(formula, "beta"); // Returns: true
+hasMacro(formula, "\\beta"); // Returns: true
+hasMacro(formula, "pi"); // Returns: false
 ```
 
 ## What it converts

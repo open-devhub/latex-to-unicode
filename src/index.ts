@@ -1,11 +1,9 @@
 import type { CharMap } from "./types/CharMap.js";
 import type { Options } from "./types/Options.js";
-import { GREEK } from "./unicode/greek.js";
 import { SUB } from "./unicode/sub.js";
 import { SUPER } from "./unicode/super.js";
-import { SYMBOLS } from "./unicode/symbols.js";
-import { replaceMacros } from "./utils/macros.js";
 import { isLatex } from "./utils/isLatex.js";
+import { replaceMacros } from "./utils/macros.js";
 
 const WRAPPER_COMMANDS = [
   "text",
@@ -100,14 +98,28 @@ function convertScript(
   map: CharMap,
   open: string,
   close: string,
+  fallback: "parentheses" | "raw" | "strip",
+  isSup: boolean,
+  isBraced: boolean,
 ): string {
   const chars = Array.from(content);
   const allMapped = chars.every((ch) => map[ch] !== undefined);
   if (allMapped) return chars.map((ch) => map[ch]).join("");
+
+  if (fallback === "raw") {
+    const prefix = isSup ? "^" : "_";
+    return isBraced ? `${prefix}{${content}}` : `${prefix}${content}`;
+  }
+  if (fallback === "strip") {
+    return content;
+  }
   return `${open}${content}${close}`;
 }
 
-function processScripts(input: string): string {
+function processScripts(
+  input: string,
+  fallback: "parentheses" | "raw" | "strip" = "parentheses",
+): string {
   let out = "";
   let i = 0;
   while (i < input.length) {
@@ -121,12 +133,28 @@ function processScripts(input: string): string {
       if (input[i + 1] === "{") {
         const group = extractBraceGroup(input, i + 1);
         if (group) {
-          out += convertScript(group.content, map, open, close);
+          out += convertScript(
+            group.content,
+            map,
+            open,
+            close,
+            fallback,
+            isSup,
+            true,
+          );
           i = group.endIdx + 1;
           continue;
         }
       } else {
-        out += convertScript(input[i + 1]!, map, open, close);
+        out += convertScript(
+          input[i + 1]!,
+          map,
+          open,
+          close,
+          fallback,
+          isSup,
+          false,
+        );
         i += 2;
         continue;
       }
@@ -151,6 +179,7 @@ function cleanup(input: string): string {
 const defaultOptions: Options = {
   latexCheck: true,
   customMacros: {},
+  fallbackBehaviour: "parentheses",
 };
 
 /**
@@ -184,7 +213,7 @@ export function latexToUnicode(input: string, opts?: Options): string {
   s = replaceMacros(s, resolvedOpts.customMacros);
   s = unwrapCommands(s);
   s = processFracAndSqrt(s);
-  s = processScripts(s);
+  s = processScripts(s, resolvedOpts.fallbackBehaviour);
   s = cleanup(s);
   return s;
 }
