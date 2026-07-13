@@ -1,0 +1,10 @@
+# ignore everything
+*
+
+# exceptions
+
+!dist/
+!dist/**
+!README.md
+!LICENSE
+!package.json
