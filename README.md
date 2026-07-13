@@ -42,18 +42,22 @@ Converts a string containing LaTeX macros, subscripts, superscripts, fractions, 
 
 You can customize the execution behavior by passing an optional `Options` object as the second argument:
 
-| Property     | Type      | Default | Description                                                                                                                                                                 |
-| :----------- | :-------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `latexCheck` | `boolean` | `true`  | When `true`, runs `isLatex(input)` first and immediately returns the input unmodified if no LaTeX patterns are detected. Set to `false` to force processing on all strings. |
+| Property       | Type                     | Default | Description                                                                                                                                                                 |
+| :------------- | :----------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `latexCheck`   | `boolean`                | `true`  | When `true`, runs `isLatex(input)` first and immediately returns the input unmodified if no LaTeX patterns are detected. Set to `false` to force processing on all strings. |
+| `customMacros` | `Record<string, string>` | `{}`    | A dictionary mapping custom LaTeX macro names (without backslashes) to their desired Unicode equivalents. Overrides default maps.                                           |
 
 ```typescript
-// Standard usage (automatically skips non-LaTeX strings using `isLatex` helper)
-const result = latexToUnicode("\\alpha + \\beta");
-console.log(result); // α + β
+// Standard usage
+const result = latexToUnicode("\\alpha + \\beta"); // α + β
 
 // Force processing even if the string doesn't look like LaTeX
-const forcedResult = latexToUnicode("x^2", { latexCheck: false });
-console.log(forcedResult); // x²
+const forcedResult = latexToUnicode("x^2", { latexCheck: false }); // x²
+
+// Custom macros
+latexToUnicode("\\R + \\mathbb{Q}", {
+  customMacros: { R: "ℝ", mathbb: "" },
+}); // ℝ + Q
 ```
 
 ### `isLatex(input: string): boolean`

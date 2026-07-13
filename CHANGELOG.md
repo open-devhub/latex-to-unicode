@@ -7,6 +7,7 @@
 - Added and exported a new utility function `isLatex` to heuristically detect whether a string contains LaTeX/math notation
 - Added a second `opts` argument to `latexToUnicode` to control its behavior.
   - `opts.checkLatex` (default: `true`) - When `true`, runs `isLatex(input)` first and immediately returns the input unmodified if no LaTeX patterns are detected. Set to `false` to force processing on all strings.
+  - `opts.customMacros` (default: `{}`) - A dictionary mapping custom LaTeX macro names (without backslashes) to their desired Unicode equivalents. Overrides default maps.
 
 ### Changed
 

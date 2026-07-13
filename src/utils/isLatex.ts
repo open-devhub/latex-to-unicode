@@ -10,6 +10,14 @@ const BRACED_SCRIPT = /[A-Za-z0-9)\]}][_^]\{[^{}]*\}/;
 
 const BARE_SUPERSCRIPT = /[A-Za-z0-9][\^][A-Za-z0-9](?![A-Za-z0-9])/;
 
+/**
+ * Heuristically determines whether a given string is likely to contain LaTeX.
+ * It scores the input based on the presence of math delimiters, known commands,
+ * subscripts/superscripts, and brace arguments.
+ *
+ * @param input
+ * @returns boolean
+ */
 export function isLatex(input: string): boolean {
   if (!input || typeof input !== "string") return false;
 

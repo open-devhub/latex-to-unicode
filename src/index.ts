@@ -4,6 +4,7 @@ import { GREEK } from "./unicode/greek.js";
 import { SUB } from "./unicode/sub.js";
 import { SUPER } from "./unicode/super.js";
 import { SYMBOLS } from "./unicode/symbols.js";
+import { replaceMacros } from "./utils/macros.js";
 import { isLatex } from "./utils/isLatex.js";
 
 const WRAPPER_COMMANDS = [
@@ -28,13 +29,6 @@ function extractBraceGroup(
     }
   }
   return null;
-}
-
-function replaceMacros(input: string): string {
-  return input.replace(
-    /\\([a-zA-Z]+)/g,
-    (full, name) => GREEK[name] ?? SYMBOLS[name] ?? full,
-  );
 }
 
 function unwrapCommands(input: string): string {
@@ -156,16 +150,38 @@ function cleanup(input: string): string {
 
 const defaultOptions: Options = {
   latexCheck: true,
+  customMacros: {},
 };
 
+/**
+ * Converts a string containing LaTeX macros, subscripts, superscripts, fractions,
+ * and roots into a Unicode-rendered equivalent.
+ * Unrecognized commands are left as-is rather than stripped, allowing partial or
+ * invalid input to degrade predictably without silently losing information.
+ *
+ * @param input - The LaTeX-formatted string to convert.
+ * @param opts - Optional configuration settings.
+ * @param opts.latexCheck - If `true`, runs `isLatex` on the input and returns it unmodified if no LaTeX is detected. Default is `true`.
+ * @param opts.customMacros - A record of custom LaTeX macro names mapped to their Unicode equivalents. Custom macros take precedence over default mappings.
+ * @returns string
+ * @example
+ * ```ts
+ * // Basic conversion
+ * latexToUnicode("\\alpha + \\beta"); // "α + β"
+ * // Using custom macros
+ * latexToUnicode("\\R + \\mathbb{Q}", {
+ * customMacros: { R: "ℝ", mathbb: "" }
+ * }); // "ℝ + Q"
+ * ```
+ */
 export function latexToUnicode(input: string, opts?: Options): string {
-  opts = { ...defaultOptions, ...opts };
+  const resolvedOpts = { ...defaultOptions, ...opts };
 
-  if (opts?.latexCheck && !isLatex(input)) return input;
+  if (resolvedOpts.latexCheck && !isLatex(input)) return input;
 
   let s = input;
   s = s.replace(/\\_/g, "_");
-  s = replaceMacros(s);
+  s = replaceMacros(s, resolvedOpts.customMacros);
   s = unwrapCommands(s);
   s = processFracAndSqrt(s);
   s = processScripts(s);
@@ -174,3 +190,4 @@ export function latexToUnicode(input: string, opts?: Options): string {
 }
 
 export { isLatex } from "./utils/isLatex.js";
+export { extractMacros, hasMacro } from "./utils/macros.js";
