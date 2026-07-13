@@ -218,5 +218,6 @@ export function latexToUnicode(input: string, opts?: Options): string {
   return s;
 }
 
+export { type Options } from "./types/Options.js";
 export { isLatex } from "./utils/isLatex.js";
 export { extractMacros, hasMacro } from "./utils/macros.js";
