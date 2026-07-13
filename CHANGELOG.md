@@ -1,6 +1,8 @@
 # Changelog
 
-## `v2.0.0` - 2026-07-13
+## `v2.0.1` - 2026-07-13
+
+> **Note:** Version `2.0.0` was unpublished/burned due to an npm registry issue. `v2.0.1` is the first stable release of the `v2` line.
 
 ### Added
 
